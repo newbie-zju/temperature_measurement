@@ -1,0 +1,9 @@
+<launch>
+    <node pkg="get_temperature" name="get_temperature" type="get_temperature_node" output="screen"/>
+
+	<!--hk-->
+	<param name="ip" type="string" value="192.168.0.200" />
+	<param name="username" type="string" value="admin" />
+	<param name="passwd" type="string" value="zjucsc301" />
+
+</launch>
