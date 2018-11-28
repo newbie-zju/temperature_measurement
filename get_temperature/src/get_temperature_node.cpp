@@ -3,8 +3,11 @@
 #include "get_temperature.h"
 #include <vector>
 #include <time.h>
+#include <fstream>
 
 using namespace std;
+
+string output_file;
 
 string getTime()
 {
@@ -38,15 +41,48 @@ class TemperatureWriter
 {
 public:
     vector<TemperatureInfo> ti_vector;
+    string output_file;
 
     TemperatureWriter(){}
+
+    TemperatureWriter(string output_file0)
+    {
+        output_file = output_file0;
+    }
 
     void write(TemperatureInfo ti)
     {
         for (int i = 0; i < ti_vector.size() ; i++)
             if (ti_vector[i].key == ti.key)
                 return;
-        cout << "时间:" << getTime() << ", " <<"预置点:" << ti.num << ", " << "ID:"<< ti.id << ", " << "温度:"<< ti.temperature << endl;
+
+        ifstream ifile;
+        ifile.open(output_file);
+        if(!ifile)
+        {
+            cout<<output_file<<"不存在"<<endl;
+            ofstream ofile;
+            ofile.open(output_file);
+            ofile<<endl;
+            ofile.close();
+            ifile.open(output_file);
+            if(!ifile)
+            {
+                cout<<"创建失败"<<endl;
+                return;
+            }
+            else
+            {
+                cout<<"创建成功"<<endl;
+                ifile.close();
+            }
+        }
+
+        ofstream ofile;
+        ofile.open(output_file, ios::app);
+        ofile<<"时间:" << getTime() << ", " <<"预置点:" << ti.num << ", " << "ID:"<< ti.id << ", " << "温度:"<< ti.temperature << endl;
+        cout<<"时间:" << getTime() << ", " <<"预置点:" << ti.num << ", " << "ID:"<< ti.id << ", " << "温度:"<< ti.temperature << endl;
+
         ti_vector.push_back(ti);
     }
     void clean()
@@ -90,6 +126,8 @@ int main(int argc, char **argv){
     if(!nh.getParam("username", username)) username = "admin";
     string passwd;
     if(!nh.getParam("passwd", passwd)) passwd = "zjucsc301";
+    if(!nh.getParam("output_file", output_file)) output_file = "~/Desktop/wl/result.txt";
+    tw = TemperatureWriter(output_file);
 
     //---------------------------------------
     NET_DVR_Init();
